@@ -1,0 +1,15 @@
+[package]
+name = "smux_rpc_infra"
+version = "0.1.0"
+edition = "2024"
+
+authors = ["lino <lino_snsalias@outlook.com>"]
+description = "Library for RPC infrastructure based on stream multiplexing"
+repository = "https://github.com/ljsnogard/smux_rpc_infra.rs"
+keywords = ["rpc"]
+categories = ["no-std"]
+license = "MIT/Apache-2.0"
+readme = "README.md"
+
+[dependencies]
+abs_smux = { git = "https://github.com/ljsnogard/abs_smux.git", branch = "dev/0.1.0"}

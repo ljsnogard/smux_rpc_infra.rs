@@ -7,9 +7,8 @@ use abs_buff::TrBuffRead;
 use abs_smux::x_deps::{abs_buff, abs_sync};
 use abs_sync::may_cancel::TrMayCancel;
 
-use crate::{
-    session::*,
-};
+use crate::{session::*, uri::TrUri};
+
 /// The access method or the operation that will exert to a resource via RPC.
 #[derive(Clone, Copy, Debug)]
 pub enum AccessMethod {
@@ -19,27 +18,27 @@ pub enum AccessMethod {
     /// Calling an API with guarantees.
     Call,
 
-    /// View the resource in a specific manner.
-    View,
+    /// Delete resource on the server
+    Delete,
 
     /// Post a new resource on to the server
     Post,
-
-    /// Remove or disable a resource on the server
-    Drop,
 
     /// Subscribe and receive live update event of a resource
     Pull,
 
     /// broadcast live update of a resource via the server
     Push,
+
+    /// View the resource in a specific manner.
+    View,
 }
 
 pub trait TrRpcError
 where
     Self: Sized + Error
 {
-    fn err_code(&self) -> ReactCode;
+    fn react_code(&self) -> ReactCode;
 }
 
 pub trait TrAccess<'a>
@@ -47,17 +46,17 @@ where
     Self: 'a,
 {
     type Err: TrRpcError;
-    type Path;
-    type Key;
+    type Uri: TrUri;
+    type Key: AsRef<str>;
     type Sess: TrSession;
 
     fn method(&self) -> AccessMethod;
 
-    fn location(&self) -> &Self::Path;
+    fn location(&self) -> &Self::Uri;
 
     fn headers<'f>(
         &'f self,
-    ) -> impl IntoIterator<Item = (&'a Self::Key, &'a [u8])>;
+    ) -> impl IntoIterator<Item: AsRef<Self::Key> + AsRef<[u8]>>;
 
     fn body<'f>(&'f self) -> impl TrBuffRead<u8>;
 

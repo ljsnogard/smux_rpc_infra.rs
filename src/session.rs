@@ -9,6 +9,12 @@ pub trait TrCallSession: TrSession {
     type Args;
 }
 
+pub trait TrDeleteSession: TrSession
+{}
+
+pub trait TrViewSession: TrSession
+{}
+
 pub trait TrPostSession: TrSession {
     type Body;
 }

@@ -6,25 +6,11 @@ use core::{
 use abs_smux::x_deps::abs_sync;
 use abs_sync::may_cancel::TrMayCancel;
 
-/// Represent the application level error
-pub enum StreamAppError {
-    /// The remote end of the item stream is closed
-    Closed,
-
-    /// The operation to push or pull is cancelled.
-    Cancelled,
-}
-
-pub trait TrStreamError
-where
-    Self: Sized + Error,
-{
-    fn try_into_rpc_err(self) -> Result<StreamAppError, Self>;
-}
+use crate::message::TrRpcError;
 
 pub trait TrPullAgent {
     type Item;
-    type Err: TrStreamError;
+    type Err: TrRpcError;
 
     fn pull_async(
         &mut self,
@@ -33,7 +19,7 @@ pub trait TrPullAgent {
 
 pub trait TrPushAgent {
     type Item;
-    type Err: TrStreamError;
+    type Err: TrRpcError;
 
     fn push_async<'f, F>(
         &'f mut self,

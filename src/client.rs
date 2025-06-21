@@ -1,6 +1,4 @@
-use core::{
-    ops::Try,
-};
+use core::ops::Try;
 
 use abs_smux::x_deps::abs_sync;
 use abs_sync::may_cancel::TrMayCancel;
@@ -10,12 +8,12 @@ use crate::{
     session::*,
 };
 
-pub trait TrRequestBuilder<'a>
+pub trait TrAccessBuilder<'a>
 where
     Self: 'a,
 {
     /// Data type or representation of the location
-    type Path;
+    type Uri;
 
     /// The header key data type
     type Key;
@@ -25,7 +23,7 @@ where
 
     /// The data type of access that will be created by this builder
     type Access: TrAccess<'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Key = Self::Key,
         Sess = Self::Sess,
     >;
@@ -37,70 +35,70 @@ where
 
 pub trait TrRpcClient 
 {
-    type Path: AsRef<str>;
+    type Uri: AsRef<str>;
 
     fn head<'a, S: TrHeadSession>(
         &'a self,
-        location: &'a Self::Path,
-    ) -> impl TrRequestBuilder<'a, Access: TrAccess<
+        location: &'a Self::Uri,
+    ) -> impl TrAccessBuilder<'a, Access: TrAccess<
         'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Sess = S,
     >>;
 
     fn call<'a, S: TrCallSession>(
         &'a self,
-        location: &'a Self::Path,
+        location: &'a Self::Uri,
         arguments: &'a S::Args,
-    ) -> impl TrRequestBuilder<Access: TrAccess<
+    ) -> impl TrAccessBuilder<Access: TrAccess<
         'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Sess = S,
     >>;
 
-    fn view<'a, S: TrSession>(
+    fn view<'a, S: TrViewSession>(
         &'a self,
-        location: &'a Self::Path,
-    ) -> impl TrRequestBuilder<Access: TrAccess<
+        location: &'a Self::Uri,
+    ) -> impl TrAccessBuilder<Access: TrAccess<
         'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Sess = S,
     >>;
 
-    fn drop<'a, S: TrSession>(
+    fn delete<'a, S: TrDeleteSession>(
         &'a self,
-        location: &'a Self::Path
-    ) -> impl TrRequestBuilder<Access: TrAccess<
+        location: &'a Self::Uri
+    ) -> impl TrAccessBuilder<Access: TrAccess<
         'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Sess = S,
     >>;
 
     fn post<'a, S: TrPostSession>(
         &'a self,
-        location: &'a Self::Path,
-        body: &'a S::Body,
-    ) -> impl TrRequestBuilder<Access: TrAccess<
+        location: &'a Self::Uri,
+        content: &'a S::Body,
+    ) -> impl TrAccessBuilder<Access: TrAccess<
         'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Sess = S,
     >>;
 
     fn push<'a, S: TrPushSession>(
         &'a self,
-        location: &'a Self::Path,
-    ) -> impl TrRequestBuilder<Access: TrAccess<
+        location: &'a Self::Uri,
+    ) -> impl TrAccessBuilder<Access: TrAccess<
         'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Sess = S,
     >>;
 
     fn pull<'a, S: TrPullSession>(
         &'a self,
-        location: &'a Self::Path,
-    ) -> impl TrRequestBuilder<Access: TrAccess<
+        location: &'a Self::Uri,
+    ) -> impl TrAccessBuilder<Access: TrAccess<
         'a,
-        Path = Self::Path,
+        Uri = Self::Uri,
         Sess = S,
     >>;
 }
@@ -110,7 +108,7 @@ mod demo_ {
     use core::ops::ControlFlow;
     use abs_smux::x_deps::abs_sync::{cancellation::NonCancellableToken, preludes::TrMayCancel};
 
-    use crate::client::{TrRequestBuilder, TrRpcClient};
+    use crate::client::{TrAccessBuilder, TrRpcClient};
     use super::*;
 
     #[allow(unused)]
@@ -125,7 +123,7 @@ mod demo_ {
     #[allow(unused)]
     async fn sample_<TClient>(client: TClient)
     where
-        TClient: TrRpcClient<Path = str>
+        TClient: TrRpcClient<Uri = str>
     {
         let ControlFlow::Continue(mut a) = client.head::<SampleHeadSession>("path")
             .try_build_async()

@@ -12,4 +12,5 @@ license = "MIT/Apache-2.0"
 readme = "README.md"
 
 [dependencies]
-abs_smux = { git = "https://github.com/ljsnogard/abs_smux.git", branch = "dev/0.1.0"}
+# abs_smux = { git = "https://github.com/ljsnogard/abs_smux.git", branch = "dev/0.1.0"}
+abs_smux = { path = "../abs_smux" }

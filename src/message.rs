@@ -60,7 +60,7 @@ where
 
     fn body<'f>(&'f self) -> impl TrBuffRead<u8>;
 
-    fn send_async<'f>(
+    fn acquire_async<'f>(
         &'f mut self,
     ) -> impl TrMayCancel<'f, MayCancelOutput =
         Result<<Self::Sess as TrSession>::Resp, Self::Err>>;
